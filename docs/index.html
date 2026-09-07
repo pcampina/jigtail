@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JigTail — a native menu-bar mouse jiggler for macOS</title>
+  <meta name="description" content="JigTail waits until you're idle, then nudges your cursor just enough to keep sleep and the screensaver away. Free, native, and open source for macOS." />
+
+  <meta property="og:title" content="JigTail — a native menu-bar mouse jiggler for macOS" />
+  <meta property="og:description" content="Waits until you're idle, then nudges your cursor just enough to keep sleep and the screensaver away." />
+  <meta property="og:image" content="https://pcampina.github.io/jigtail/assets/icon.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary" />
+
+  <link rel="icon" href="assets/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <div class="wrap">
+    <nav class="nav">
+      <a class="nav-brand" href="#top">
+        <img src="assets/icon.png" alt="" width="28" height="28" />
+        JigTail
+      </a>
+      <a class="nav-link" href="https://github.com/pcampina/jigtail" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.73.5.5 5.73.5 12c0 5.09 3.29 9.4 7.86 10.93.57.1.79-.25.79-.55 0-.27-.01-1.15-.02-2.09-3.2.7-3.87-1.36-3.87-1.36-.53-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.1 11.1 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.24 2.75.12 3.04.74.81 1.18 1.83 1.18 3.09 0 4.42-2.69 5.39-5.25 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.79-.01 3.17 0 .3.21.66.8.55A10.52 10.52 0 0 0 23.5 12C23.5 5.73 18.27.5 12 .5Z"/></svg>
+        GitHub
+      </a>
+    </nav>
+  </div>
+
+  <main id="top">
+    <div class="wrap">
+      <section class="hero">
+        <h1 class="wordmark">JigTail</h1>
+        <p class="hero-sub">Keeps your Mac awake — only when it actually needs to.</p>
+        <p class="hero-body">
+          A tiny, free, native menu-bar app that waits until you're idle, then nudges the
+          cursor just enough to hold off sleep and the screensaver, so a render, build,
+          download, or backup can finish unattended.
+        </p>
+
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="https://github.com/pcampina/jigtail/releases/latest" target="_blank" rel="noopener">Download on GitHub</a>
+          <a class="btn btn-secondary" href="https://github.com/pcampina/jigtail" target="_blank" rel="noopener">View source</a>
+        </div>
+        <p class="hero-fineprint">Free · Open source · No accounts, no telemetry</p>
+
+        <div class="demo" id="demo">
+          <div class="demo-header">
+            <img class="demo-app-icon" src="assets/icon.png" width="44" height="44" alt="" />
+            <div class="demo-header-text">
+              <div class="demo-app-name">JigTail</div>
+              <div class="demo-app-sub">Keeps your Mac awake · Menu&hellip;</div>
+            </div>
+            <span class="demo-gear" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+            </span>
+          </div>
+
+          <div class="demo-divider"></div>
+
+          <div class="demo-body">
+            <div class="demo-knob-frame">
+              <div class="demo-ring-ticks" id="demoRingTicks"></div>
+              <button class="knob" id="knob" type="button" aria-pressed="false">
+                <span class="knob-dish" id="knobDish">
+                  <span class="knob-cursor" id="knobCursor" aria-hidden="true"></span>
+                </span>
+              </button>
+            </div>
+            <div class="demo-status">
+              <span class="demo-dot" id="demoDot"></span>
+              <span id="demoLabel">Off · Click to start</span>
+              <span class="demo-timer" id="demoTimer">0:02</span>
+            </div>
+          </div>
+
+          <div class="demo-divider"></div>
+
+          <div class="demo-intervals">
+            <div class="demo-intervals-label">Start jiggling after</div>
+            <div class="demo-pills" id="demoPills">
+              <button class="demo-pill" type="button" data-interval="1m">1m</button>
+              <button class="demo-pill active" type="button" data-interval="5m">5m</button>
+              <button class="demo-pill" type="button" data-interval="15m">15m</button>
+              <button class="demo-pill" type="button" data-interval="30m">30m</button>
+              <button class="demo-pill" type="button" data-interval="60m">60m</button>
+            </div>
+          </div>
+
+          <div class="demo-divider"></div>
+
+          <p class="demo-footnote">A live, compressed replica of the real popover</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap">
+      <section class="quote-section">
+        <blockquote>
+          <p>“Screensavers and sleep don't know the difference between you stepping away and you waiting on a five-hour export.”</p>
+          <cite>Why JigTail exists</cite>
+        </blockquote>
+      </section>
+    </div>
+
+    <div class="wrap">
+      <section id="features">
+        <div class="section-head">
+          <h2>What it does</h2>
+          <p>Small and specific: it holds off sleep while you're away, and disappears the second you're back.</p>
+        </div>
+
+        <div class="bento">
+          <div class="card card-triggers">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M4 12h16M4 18h7"/><circle cx="17" cy="6" r="2"/><circle cx="9" cy="18" r="2"/></svg>
+            </div>
+            <h3>Conditional triggers</h3>
+            <p>Skip the idle wait entirely. Jiggle only while a specific app is running, the CPU is busy, or Music or Spotify is playing — combined with simple OR logic.</p>
+            <div class="trigger-pills">
+              <span class="trigger-pill">App is running</span>
+              <span class="trigger-or">or</span>
+              <span class="trigger-pill">CPU is busy</span>
+              <span class="trigger-or">or</span>
+              <span class="trigger-pill">Music is playing</span>
+            </div>
+          </div>
+
+          <div class="card card-idle">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            </div>
+            <h3>Idle-aware</h3>
+            <p>Sits quietly until you've actually stepped away. The instant it detects real input again, it stops.</p>
+          </div>
+
+          <div class="card card-manual">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <h3>One-tap manual control</h3>
+            <p>A knob in the menu-bar popover shows exactly what's happening — off, waiting, or actively jiggling — with a live countdown ring.</p>
+          </div>
+
+          <div class="card card-sleep">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 4 5v6c0 5 3.4 8.4 8 11 4.6-2.6 8-6 8-11V5Z"/></svg>
+            </div>
+            <h3>Sleep prevention</h3>
+            <p>Holds an IOPMAssertion for the session as a belt-and-suspenders measure alongside the cursor nudge itself.</p>
+          </div>
+
+          <div class="card card-login">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v9"/><path d="M6.5 6.5a8 8 0 1 0 11 0"/></svg>
+            </div>
+            <h3>Launch at login</h3>
+            <p>Starts itself via macOS's modern SMAppService — no login-item hacks.</p>
+          </div>
+
+          <div class="card card-theme">
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18Z" fill="currentColor" stroke="none"/></svg>
+            </div>
+            <h3>Matches your theme</h3>
+            <p>Light, dark, or system — independent of the rest of macOS.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="privacy">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Nothing leaves your Mac</h2>
+          <p>JigTail asks for exactly two permissions, both used only for the jiggle itself.</p>
+        </div>
+
+        <div class="privacy-facts">
+          <div class="privacy-fact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M2 2l20 20"/></svg>
+            <span>No accounts to create</span>
+          </div>
+          <div class="privacy-fact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3-3 3 2 5-6"/><path d="M2 2l20 20"/></svg>
+            <span>No telemetry, ever</span>
+          </div>
+          <div class="privacy-fact">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12a11 11 0 0 1 14 0"/><path d="M8.5 15.5a6 6 0 0 1 7 0"/><path d="M12 19h.01"/><path d="M2 2l20 20"/></svg>
+            <span>Zero network requests</span>
+          </div>
+        </div>
+
+        <p class="privacy-note">
+          Every setting — idle threshold, jiggle interval, triggers, theme — stays in local
+          UserDefaults. Accessibility lets it move the cursor; Apple Events, only if you turn
+          on the music trigger, lets it ask Music or Spotify whether they're playing.
+        </p>
+      </div>
+    </section>
+
+    <div class="wrap">
+      <section id="screenshots">
+        <div class="section-head">
+          <h2>Looks native, because it is</h2>
+          <p>Built with SwiftUI on a neumorphic design system shared with <a href="https://pawsekeys.app" target="_blank" rel="noopener" style="color:var(--coral); font-weight:600; text-decoration:none;">PawseKeys</a>, and it follows your system appearance automatically.</p>
+        </div>
+
+        <div class="shots">
+          <img class="shot" src="popover-dark.png" alt="JigTail popover in dark mode, off" />
+          <img class="shot" src="popover-light.png" alt="JigTail popover in light mode, actively jiggling with a live countdown ring" />
+        </div>
+      </section>
+    </div>
+
+    <div class="wrap">
+      <section id="build">
+        <div class="section-head">
+          <h2>Build it yourself</h2>
+          <p>MIT licensed and small enough to read in an afternoon. No signed release yet — grab the source and build your own.</p>
+        </div>
+
+        <div class="build-panel">
+          <div class="terminal">
+            <div><span class="prompt">$</span>brew install xcodegen</div>
+            <div><span class="prompt">$</span>xcodegen generate</div>
+            <div><span class="prompt">$</span>open JigTail.xcodeproj</div>
+          </div>
+          <p class="build-req">macOS 13 Ventura or later · Apple Silicon · Xcode 15+</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <a class="footer-brand" href="#top">
+        <img src="assets/icon.png" alt="" width="22" height="22" />
+        JigTail
+      </a>
+      <div class="footer-links">
+        <a href="https://github.com/pcampina/jigtail" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/pcampina/jigtail/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
+        <a href="https://github.com/pcampina/jigtail/issues" target="_blank" rel="noopener">Report an issue</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
