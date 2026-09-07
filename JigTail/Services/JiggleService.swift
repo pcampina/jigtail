@@ -23,6 +23,11 @@ final class JiggleService {
     func start(interval: TimeInterval) {
         stop()
         self.interval = interval
+        // Fire right away: the idle threshold (or trigger) has just been satisfied, so the
+        // first jiggle shouldn't wait a further full interval — it should land the instant
+        // jigging becomes active, which is also what tells the UI to switch to its green,
+        // "actively jiggling" look.
+        fire()
         let timer = Timer(timeInterval: interval, repeats: true) { [weak self] _ in
             self?.tick()
         }

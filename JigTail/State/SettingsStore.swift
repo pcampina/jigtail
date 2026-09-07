@@ -103,7 +103,7 @@ final class SettingsStore: ObservableObject {
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
-        idleThresholdMinutes = defaults.object(forKey: Keys.idleThresholdMinutes) as? Int ?? 15
+        idleThresholdMinutes = defaults.object(forKey: Keys.idleThresholdMinutes) as? Int ?? 5
         jiggleIntervalSeconds = defaults.object(forKey: Keys.jiggleIntervalSeconds) as? Int ?? 40
         triggerMode = (defaults.string(forKey: Keys.triggerMode)).flatMap(TriggerMode.init) ?? .manual
         appRunningTriggerEnabled = defaults.object(forKey: Keys.appRunningTriggerEnabled) as? Bool ?? false

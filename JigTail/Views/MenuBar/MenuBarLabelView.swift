@@ -41,5 +41,6 @@ struct MenuBarLabelView: View {
         }
         .frame(width: 18, height: 18)
         .animation(.spring(response: 0.24, dampingFraction: 0.72), value: coordinator.hasRecentJiggle)
+        .task { coordinator.startOnLaunch() }
     }
 }

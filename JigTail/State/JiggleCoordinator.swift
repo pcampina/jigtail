@@ -114,6 +114,15 @@ final class JiggleCoordinator: ObservableObject {
         }
     }
 
+    /// Starts jiggling automatically once at launch, so JigTail is armed by default instead
+    /// of requiring a manual toggle. A no-op if it's already on (e.g. called more than once)
+    /// or if Accessibility isn't granted yet — `toggle()` surfaces that via the normal
+    /// permission-request flow rather than failing silently.
+    func startOnLaunch() {
+        guard !isMasterOn else { return }
+        toggle()
+    }
+
     func toggle() {
         if !isMasterOn {
             permissions.refresh()
@@ -208,9 +217,11 @@ final class JiggleCoordinator: ObservableObject {
             guard conditionsOK else { return }
 
             self.idleDeadline = nil
-            self.nextJiggleDeadline = Date().addingTimeInterval(TimeInterval(self.settings.jiggleIntervalSeconds))
-            self.jiggleService.start(interval: TimeInterval(self.settings.jiggleIntervalSeconds))
             self.state = .activeJiggling
+            self.nextJiggleDeadline = Date().addingTimeInterval(TimeInterval(self.settings.jiggleIntervalSeconds))
+            // Fires the first jiggle synchronously, so `state` must already read
+            // `.activeJiggling` by the time `recordJiggleActivity()` runs.
+            self.jiggleService.start(interval: TimeInterval(self.settings.jiggleIntervalSeconds))
         }
     }
 
