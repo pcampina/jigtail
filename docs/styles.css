@@ -246,6 +246,15 @@ img {
   color: var(--t3);
 }
 
+/* Filled in by script.js with the latest release's version and size. */
+.hero-release {
+  color: var(--t2);
+}
+
+.hero-release + .hero-fineprint {
+  margin-top: 4px;
+}
+
 /* ── Live knob demo ──────────────────────────────────── */
 
 .demo {

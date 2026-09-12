@@ -163,3 +163,43 @@
     });
   }
 })();
+
+// Download button. Its href already points at the latest release's JigTail.dmg,
+// so this only adds the version and size under it, and falls back to the
+// releases page when there is no DMG to download yet (or the API is unreachable).
+(() => {
+  const btn = document.getElementById('downloadBtn');
+  const meta = document.getElementById('releaseMeta');
+  if (!btn || !meta) return;
+
+  const REPO = 'pcampina/jigtail';
+  const ASSET = 'JigTail.dmg';
+
+  // iOS Safari's UA says "like Mac OS X" and iPadOS in desktop mode reports
+  // "Macintosh", so rule both out before trusting the platform string.
+  const isMac = (() => {
+    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) return false;
+    if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return false;
+    const platform = navigator.userAgentData && navigator.userAgentData.platform;
+    if (platform) return /mac/i.test(platform);
+    return /Mac OS X|Macintosh/i.test(navigator.userAgent);
+  })();
+
+  if (!isMac) meta.textContent = 'JigTail runs on macOS — open this page on your Mac to download';
+
+  fetch(`https://api.github.com/repos/${REPO}/releases/latest`, {
+    headers: { Accept: 'application/vnd.github+json' },
+  })
+    .then((res) => (res.ok ? res.json() : Promise.reject(new Error(`HTTP ${res.status}`))))
+    .then((release) => {
+      const asset = (release.assets || []).find((a) => a.name === ASSET);
+      if (!asset) throw new Error(`No ${ASSET} in ${release.tag_name}`);
+      if (isMac) {
+        const mb = (asset.size / (1024 * 1024)).toFixed(1);
+        meta.textContent = `${release.tag_name} · ${mb} MB · macOS 13+ · Apple Silicon`;
+      }
+    })
+    .catch(() => {
+      btn.href = `https://github.com/${REPO}/releases`;
+    });
+})();

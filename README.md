@@ -9,6 +9,7 @@
 Waits until you're idle, then nudges your cursor just enough to keep sleep and the
 screensaver away — so a render, build, download, or backup can finish unattended.
 
+[Download](#download) •
 [Requirements](#requirements) •
 [Building](#building) •
 [Features](#features) •
@@ -26,6 +27,13 @@ user is waiting on a five-hour export." JigTail is a small, native Swift/SwiftUI
 app, with a neumorphic UI drawn from the same design language as
 [PawseKeys](https://pawsekeys.app), that solves exactly that problem and nothing more:
 no telemetry, no accounts, no background services beyond the one it's named for.
+
+## Download
+
+Grab **[JigTail.dmg](https://github.com/pcampina/jigtail/releases/latest/download/JigTail.dmg)**
+from the [latest release](https://github.com/pcampina/jigtail/releases/latest) (or from
+[pcampina.github.io/jigtail](https://pcampina.github.io/jigtail/)), open it, and drag JigTail
+into Applications. Builds are signed with Developer ID and notarized by Apple.
 
 ## Features
 
@@ -76,8 +84,35 @@ xcodebuild -project JigTail.xcodeproj -scheme JigTail -configuration Debug build
 xcodebuild -project JigTail.xcodeproj -scheme JigTail -configuration Debug test
 ```
 
-A signed, notarized release build is produced by [`Scripts/build_release.sh`](Scripts/build_release.sh)
-(see its header comment for the one-time Developer ID / notarytool setup it expects).
+## Releasing
+
+Releases are cut by pushing a version tag:
+
+```bash
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+[`.github/workflows/release.yml`](.github/workflows/release.yml) runs the unit tests, then
+`bundle exec fastlane release_mac` ([`fastlane/Fastfile`](fastlane/Fastfile)): it pulls the
+Developer ID certificate and profile from the shared `pcampina/certificates` match repo
+(readonly), archives with the tag's version, notarizes and staples the app, and wraps it in a
+signed, notarized `JigTail.dmg` that's published as the latest GitHub Release. The landing
+page links to `releases/latest/download/JigTail.dmg`, so it picks the build up on its own.
+Running the workflow manually (**Actions → Release → Run workflow**) builds the DMG as a run
+artifact without publishing anything.
+
+The workflow needs these repository secrets: `MATCH_PASSWORD`, `MATCH_GIT_PRIVATE_KEY`
+(base64 of a deploy key with read access to the certificates repo), `ASC_KEY_ID`,
+`ASC_ISSUER_ID`, and `ASC_PRIVATE_KEY` (an App Store Connect API key, used for notarization).
+
+The Developer ID provisioning profile is created once, from a machine with write access to the
+certificates repo, using an App Store Connect API key for the same team (the `.p8` is read from
+`~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8` unless `key_path:` says otherwise):
+
+```bash
+bundle install
+bundle exec fastlane sync_signing key_id:<KEY_ID> issuer_id:<ISSUER_ID>
+```
 
 ## Permissions & privacy
 
