@@ -240,6 +240,21 @@ img {
   box-shadow: var(--sh-inset);
 }
 
+.btn-coffee {
+  color: #2b2007;
+  background: linear-gradient(135deg, #ffe680, #ffdd00);
+  box-shadow: 0 8px 20px rgba(255, 221, 0, 0.22), var(--sh-raised-sm);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-coffee:hover {
+  transform: translateY(-1px);
+}
+
+.btn-coffee:active {
+  transform: translateY(0);
+}
+
 .hero-fineprint {
   margin-top: 18px;
   font-size: 13px;
