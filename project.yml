@@ -10,6 +10,7 @@ settings:
     ONLY_ACTIVE_ARCH: YES
     MACOSX_DEPLOYMENT_TARGET: "13.0"
     SWIFT_VERSION: "5.0"
+    DEVELOPMENT_TEAM: X73Z2664P5
 targets:
   JigTail:
     type: application
@@ -32,6 +33,17 @@ targets:
         CODE_SIGN_STYLE: Automatic
         GENERATE_INFOPLIST_FILE: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      configs:
+        # Ships as a DMG outside the Mac App Store, so Developer ID. Automatic
+        # stays for Debug (local Xcode work); Release is Manual because with
+        # Automatic, xcodebuild archive looks for a "Mac Development" certificate
+        # that does not exist on a CI runner — match installs only the Developer
+        # ID certificate and its profile. match names macOS profiles with a
+        # trailing " macos"; the suffix is part of the name.
+        Release:
+          CODE_SIGN_STYLE: Manual
+          CODE_SIGN_IDENTITY: "Developer ID Application"
+          PROVISIONING_PROFILE_SPECIFIER: "match Direct dev.campina.jigtail macos"
   JigTailTests:
     type: bundle.unit-test
     platform: macOS

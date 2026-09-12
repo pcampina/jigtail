@@ -8,7 +8,7 @@ final class SettingsStoreTests: XCTestCase {
         defer { defaults.removePersistentDomain(forName: suiteName) }
 
         let store = SettingsStore(defaults: defaults)
-        XCTAssertEqual(store.idleThresholdMinutes, 15)
+        XCTAssertEqual(store.idleThresholdMinutes, 5)
         XCTAssertEqual(store.jiggleIntervalSeconds, 40)
         XCTAssertEqual(store.triggerMode, .manual)
         XCTAssertFalse(store.appRunningTriggerEnabled)

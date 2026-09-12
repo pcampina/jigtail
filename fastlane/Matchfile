@@ -1,0 +1,13 @@
+# Certificates and provisioning profiles are stored, encrypted, in a private
+# repo shared with the other apps — same setup as pawsekeys and fincampx.
+#
+# CI reads it with a deploy key (MATCH_GIT_PRIVATE_KEY) and never writes:
+# every CI lane passes readonly: true. To mint or renew the Developer ID
+# profile, run `bundle exec fastlane sync_signing` locally, where you have
+# write access (see the lane's comment in the Fastfile).
+git_url("git@github.com:pcampina/certificates.git")
+storage_mode("git")
+
+team_id("X73Z2664P5")
+
+app_identifier(["dev.campina.jigtail"])

@@ -9,3 +9,10 @@ xcuserdata/
 *.xcscmblueprint
 .swiftpm/
 .idea/
+*.dmg
+
+# Fastlane
+fastlane/report.xml
+fastlane/README.md
+fastlane/test_output/
+vendor/bundle/

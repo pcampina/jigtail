@@ -1,0 +1,131 @@
+name: Release
+
+# A release is a tag on a reviewed commit, and nothing else:
+#
+#   git tag v0.2.0 && git push origin v0.2.0
+#
+# builds JigTail.dmg with fastlane — Developer ID signed with the shared
+# pcampina/certificates repo (match, readonly), notarised by Apple — and
+# publishes it as the latest GitHub Release. The landing page links to
+# releases/latest/download/JigTail.dmg, so it serves the new build without a
+# deploy of its own.
+#
+# A manual run builds and attaches the DMG to the run as an artifact, but never
+# publishes a release. Use it as a dry run before tagging.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  # Notarisation is not transactional; never cancel a release halfway.
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT: "30"
+  FASTLANE_XCODEBUILD_SETTINGS_RETRIES: "5"
+  FASTLANE_SKIP_UPDATE_CHECK: "1"
+
+jobs:
+  # Never ship something whose tests are red.
+  test:
+    name: Unit tests
+    runs-on: macos-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        if: runner.environment == 'github-hosted'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install XcodeGen
+        run: brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Run fastlane test
+        run: bundle exec fastlane test
+
+  build:
+    name: Build, sign and notarise
+    needs: test
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        if: runner.environment == 'github-hosted'
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+
+      - name: Install XcodeGen
+        run: brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Decode the match deploy key
+        env:
+          MATCH_GIT_BOT_B64: ${{ secrets.MATCH_GIT_PRIVATE_KEY }}
+        run: |
+          if [ -z "$MATCH_GIT_BOT_B64" ]; then
+            echo "::error::MATCH_GIT_PRIVATE_KEY is empty"
+            exit 1
+          fi
+          echo "$MATCH_GIT_BOT_B64" | base64 -d > "$RUNNER_TEMP/match_key"
+          chmod 600 "$RUNNER_TEMP/match_key"
+          echo "MATCH_GIT_PRIVATE_KEY=$RUNNER_TEMP/match_key" >> "$GITHUB_ENV"
+
+      - name: Run fastlane release_mac
+        run: bundle exec fastlane release_mac
+        env:
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: JigTail-dmg
+          path: build/JigTail.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: Publish GitHub release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: JigTail-dmg
+          path: dist
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: JigTail ${{ github.ref_name }}
+          body: |
+            Download **JigTail.dmg**, open it and drag JigTail into Applications.
+            Signed with Developer ID and notarised by Apple. Requires macOS 13
+            Ventura or later on Apple Silicon.
+          files: dist/JigTail.dmg
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          make_latest: true

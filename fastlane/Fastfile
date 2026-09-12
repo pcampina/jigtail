@@ -1,0 +1,170 @@
+default_platform(:mac)
+
+# Signing assets live in the private pcampina/certificates repo and are pulled
+# by `match` in readonly mode. The only lane that writes to that repo is
+# `sync_signing`, run by hand from a trusted machine when the Developer ID
+# profile needs creating or renewing.
+#
+# JigTail ships only as a DMG on GitHub Releases (linked from the landing
+# page), never through the Mac App Store, so there is a single release lane.
+
+TEAM_ID  = "X73Z2664P5".freeze
+APP_ID   = "dev.campina.jigtail".freeze
+DMG_NAME = "JigTail.dmg".freeze # unversioned, so releases/latest/download/JigTail.dmg never moves
+
+# Shared helpers ──────────────────────────────────────────────────────────────
+
+def asc_api_key
+  app_store_connect_api_key(
+    key_id:      ENV.fetch("APP_STORE_CONNECT_API_KEY_ID"),
+    issuer_id:   ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+    key_content: ENV.fetch("APP_STORE_CONNECT_API_KEY"),
+    in_house:    false
+  )
+end
+
+# XcodeGen owns the project, so regenerate before every build — a stale
+# .xcodeproj must never be what ships.
+def generate_project
+  sh("cd .. && xcodegen generate")
+end
+
+def project_version
+  File.read(File.expand_path("../project.yml", __dir__))[/MARKETING_VERSION:\s*"?(\d+\.\d+\.\d+)"?/, 1]
+end
+
+# Tags look like v1.2.3. A manual run on a branch falls back to project.yml.
+def release_version
+  ENV["VERSION"] || ENV["GITHUB_REF_NAME"].to_s[/\Av(\d+\.\d+\.\d+)\z/, 1] || project_version
+end
+
+def build_number
+  ENV["BUILD"] || ENV["GITHUB_RUN_NUMBER"] || "1"
+end
+
+def version_args
+  "MARKETING_VERSION=#{release_version} CURRENT_PROJECT_VERSION=#{build_number}"
+end
+
+# The SHA-1 of this team's Developer ID Application identity. Matching on the
+# team rather than the bare "Developer ID Application" name keeps codesign from
+# failing as ambiguous on a Mac that holds identities for more than one team.
+def developer_id_identity
+  line = sh("security find-identity -v -p codesigning", log: false)
+         .lines.find { |l| l.include?("Developer ID Application") && l.include?("(#{TEAM_ID})") }
+  UI.user_error!("No Developer ID Application identity for team #{TEAM_ID} in the keychain") unless line
+  line.split[1]
+end
+
+platform :mac do
+  desc "Run the unit tests, ad-hoc signed so no certificate is needed"
+  lane :test do
+    generate_project
+    run_tests(
+      project: "JigTail.xcodeproj",
+      scheme: "JigTail",
+      destination: "platform=macOS,arch=arm64",
+      # A CI runner has no Mac Development certificate. Hardened runtime is off
+      # because library validation refuses to load an ad-hoc signed test bundle
+      # into an ad-hoc signed host: neither carries a team ID.
+      xcargs: "CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= ENABLE_HARDENED_RUNTIME=NO"
+    )
+  end
+
+  # One-off, from a machine with write access to pcampina/certificates:
+  #
+  #   bundle exec fastlane sync_signing key_id:ABC123DEFG issuer_id:xxxxxxxx-xxxx-...
+  #
+  # Authenticates with an App Store Connect API key rather than an Apple ID,
+  # whose login spaceship cannot currently complete ("Service key is empty",
+  # fastlane/fastlane#30199). Registers the bundle ID first, because sigh
+  # refuses to create a profile for an identifier the portal doesn't know.
+  desc "Register the bundle ID and create the Developer ID profile in the match repo"
+  lane :sync_signing do |options|
+    key_id = options[:key_id] || ENV.fetch("APP_STORE_CONNECT_API_KEY_ID")
+    api_key = app_store_connect_api_key(
+      key_id:       key_id,
+      issuer_id:    options[:issuer_id] || ENV.fetch("APP_STORE_CONNECT_API_ISSUER_ID"),
+      key_filepath: File.expand_path(options[:key_path] || "~/.appstoreconnect/private_keys/AuthKey_#{key_id}.p8"),
+      in_house:     false
+    )
+
+    if Spaceship::ConnectAPI::BundleId.find(APP_ID)
+      UI.message("Bundle ID #{APP_ID} is already registered")
+    else
+      Spaceship::ConnectAPI::BundleId.create(name: "JigTail", platform: "MAC_OS", identifier: APP_ID)
+      UI.success("Registered bundle ID #{APP_ID}")
+    end
+
+    match(
+      type: "developer_id",
+      app_identifier: APP_ID,
+      platform: "macos",
+      readonly: false,
+      api_key: api_key
+    )
+  end
+
+  desc "Build, notarise and package the Developer ID build of JigTail as a DMG"
+  lane :release_mac do
+    setup_ci if ENV["CI"]
+    generate_project
+
+    api_key = asc_api_key
+
+    match(
+      type: "developer_id",
+      app_identifier: APP_ID,
+      platform: "macos",
+      readonly: true,
+      api_key: api_key
+    )
+
+    build_dir = File.expand_path("../build", __dir__)
+    sh("rm -rf '#{build_dir}'")
+
+    app_path = build_mac_app(
+      project: "JigTail.xcodeproj",
+      scheme: "JigTail",
+      configuration: "Release",
+      export_method: "developer-id",
+      clean: true,
+      output_directory: build_dir,
+      xcargs: version_args,
+      export_options: {
+        signingStyle: "manual",
+        teamID: TEAM_ID,
+        # match suffixes macOS profile names with " macos" — without it the
+        # export step cannot find the profile it just installed.
+        provisioningProfiles: { APP_ID => "match Direct #{APP_ID} macos" }
+      }
+    )
+
+    # Stapling the app itself means it still passes Gatekeeper offline once
+    # it has been copied out of the DMG.
+    notarize(package: app_path, api_key: api_key, print_log: true)
+
+    dmg_path = File.join(build_dir, DMG_NAME)
+    sh("command -v create-dmg >/dev/null 2>&1 || brew install create-dmg")
+    sh([
+      "create-dmg",
+      "--volname 'JigTail'",
+      "--window-pos 200 120",
+      "--window-size 600 400",
+      "--icon-size 128",
+      "--icon 'JigTail.app' 170 190",
+      "--hide-extension 'JigTail.app'",
+      "--app-drop-link 430 190",
+      "'#{dmg_path}'",
+      "'#{app_path}'"
+    ].join(" "))
+
+    # The DMG is what gets downloaded, so it is signed and notarised too;
+    # otherwise Gatekeeper judges the container before it ever sees the app.
+    sh("codesign --force --timestamp --sign #{developer_id_identity} '#{dmg_path}'")
+    notarize(package: dmg_path, api_key: api_key, print_log: true)
+
+    sh("shasum -a 256 '#{dmg_path}'")
+    UI.success("JigTail #{release_version} (#{build_number}) ready at #{dmg_path}")
+  end
+end
